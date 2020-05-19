@@ -1,6 +1,8 @@
 # NodeMCUTallyLight
 A tally light for a blackmagic switcher. This uses a nodeMCU and a nodered script running from the [blackmagic-atem-nodered](https://www.npmjs.com/package/blackmagic-atem-nodered).
 
+## New version!
+This version implements a subscribe based messaging system. Currently the keyer is not supported on the nodered side.
 
 ### Script to translate blackmagic commands to broadcast packets sent to the nodes
 ```
