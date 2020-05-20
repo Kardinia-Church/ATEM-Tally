@@ -22,7 +22,8 @@ int inputID = 3;
 
 unsigned long thisMs = 0;
 
-uint8_t ignoredMEs[4] = {-1, -1, -1, -1};
+#define ME_COUNT 4
+uint8_t ignoredMEs[ME_COUNT] = {1, 2, 3, -1};
 #define CMD_SUBSCRIBE 0xAF
 #define CMD_PING 0xFA
 #define CMD_PROGRAM 0x01
@@ -60,8 +61,12 @@ void subscribe() {
   Serial.println("Subscribe");
   //Subscribe cmd, inputId, ignoreME(s)
   udp.beginPacket(serverIP, OUTGOING_PORT);
-  uint8_t buffer[6] = {CMD_SUBSCRIBE, inputID, ignoredMEs[0], ignoredMEs[1], ignoredMEs[2], ignoredMEs[3]};
-  udp.write(buffer, 6);
+  uint8_t buffer[ME_COUNT + 2] = {CMD_SUBSCRIBE, inputID};
+  for(int i = 0; i < ME_COUNT; i++) {
+    buffer[i + 2] = ignoredMEs[i];
+  }
+
+  udp.write(buffer, ME_COUNT + 4);
   udp.endPacket();
   lastMessage = millis();
 }
@@ -142,8 +147,10 @@ void receivePacket() {
       strip.setPixelColor(1, offColor);
     }
   }
-  else if(lastMessage + 5000 < millis()) {
+  else if(lastMessage + 1000 < millis()) {
     if(pingSent) {
+      strip.setPixelColor(0, blueColor);
+      strip.setPixelColor(1, blueColor);
       subscribe();
     }
     else {
