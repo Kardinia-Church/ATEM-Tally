@@ -10,6 +10,9 @@ This project is a tally light for a BlackMagic ATEM production switcher. This us
 * Uses network broadcast so defining ip addresses is not needed, they just have to be on the same network
 * Show blue feature which shows a blue light to the stage to show where the camera is
 
+## Download
+[Click here to download the latest release](https://github.com/Kardinia-Church/ATEM-Tally/releases)
+
 # How to use
 There are 2 major parts that are needed to make this work, this is the tally(s) it's self, and the server which talks directly to the ATEM
 ## Server Side
@@ -37,7 +40,7 @@ The following hardware is required to build a single tally
 * Note the first LED in the chain is the user LED
 ### Programming the NodeMCU
 * In order to program the NodeMCU you either need to download [Visual Studio Code](https://code.visualstudio.com/) and install the [PlatformIO](https://platformio.org/install/ide?install=vscode) extension which is used to compile the project
-* Download the source code from GitHub by pressing the code download button and press Download ZIP
+* Download the source code from GitHub [here!](https://github.com/Kardinia-Church/ATEM-Tally/releases)
 * Open Platform IO home in Visual Studio Code and open the project found in the ``Source`` folder
 * Open the ```settings.h``` file found in the ```src``` folder. This contains the settings that can be configured
 * At the minimum the ```ssid``` and ```password``` must be set to your wifi network. This must be the same network as the server!
