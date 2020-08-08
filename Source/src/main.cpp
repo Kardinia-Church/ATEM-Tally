@@ -1,29 +1,24 @@
 /*
- * Camera Tally Light
- * Connect LEDs to pin D2 on the node mcu
- * 
- * Version Purple
- */
-#define VERSION strip.Color(0, 255, 255);
+  ATEM Tally by Kardinia Church 2020
+  A simple tally light that shows an input's tally state using NodeRed as a server
+
+  https://github.com/Kardinia-Church/ATEM-Tally
+
+  main.cpp file responsible for the main entry point and code functions
+*/
+
+#define VERSION strip.Color(255, 0, 255)
 
 #include <Adafruit_NeoPixel.h>
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
 
-int inputID = 3;
-
 #define SERIAL_BAUD 115200
 #define INCOMING_PORT 5657
 #define OUTGOING_PORT 8001
-
-#define WIFI_STA_SSID ""
-#define WIFI_STA_PSWD ""
 #define DEBUG false
-
 unsigned long thisMs = 0;
 
-#define ME_COUNT 4
-uint8_t ignoredMEs[ME_COUNT] = {1, 2, 3, -1};
 #define CMD_SUBSCRIBE 0xAF
 #define CMD_PING 0xFA
 #define CMD_PROGRAM 0x01
@@ -31,42 +26,29 @@ uint8_t ignoredMEs[ME_COUNT] = {1, 2, 3, -1};
 #define CMD_DSKEY 0x03
 #define CMD_USKEY 0x04
 
-const bool previewEnabled = true;
-const bool programEnabled = true;
-const bool keyerDSEnabled = false;
-const bool keyerUSEnabled = false;
-const bool showBlue = false;
-
-unsigned long lastMessage = millis();
-
 WiFiUDP udp;
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(2, 4, NEO_GRB + NEO_KHZ800);
 IPAddress serverIP(255,255,255,255);
+unsigned long lastMessage = millis();
 bool programTally = false;
 bool previewTally = false;
 bool usKeyTally = false;
 bool dsKeyTally = false;
 bool pingSent = false;
 
-//G R B
-int version = VERSION
-int liveColor = strip.Color(0, 255, 0);
-int keyerColor = strip.Color(120, 255, 0);
-int standbyColor = strip.Color(255, 0, 0);
-int blueColor = strip.Color(0, 0, 255);
-int offColor = strip.Color(0, 0, 0);
+#include "settings.h"
 
 //Send a request to subscribe
 void subscribe() {
   Serial.println("Subscribe");
   //Subscribe cmd, inputId, ignoreME(s)
   udp.beginPacket(serverIP, OUTGOING_PORT);
-  uint8_t buffer[ME_COUNT + 2] = {CMD_SUBSCRIBE, inputID};
-  for(int i = 0; i < ME_COUNT; i++) {
+  uint8_t buffer[(sizeof(ignoredMEs) / sizeof(ignoredMEs[0])) + 2] = {CMD_SUBSCRIBE, inputID};
+  for(int i = 0; i < (sizeof(ignoredMEs) / sizeof(ignoredMEs[0])); i++) {
     buffer[i + 2] = ignoredMEs[i];
   }
 
-  udp.write(buffer, ME_COUNT + 4);
+  udp.write(buffer, (sizeof(ignoredMEs) / sizeof(ignoredMEs[0])) + 4);
   udp.endPacket();
   lastMessage = millis();
 }
@@ -161,13 +143,13 @@ void receivePacket() {
 
 void setup() {
   Serial.begin(SERIAL_BAUD);
-  Serial.println("Connecting to " + String(WIFI_STA_SSID));
+  Serial.println("Connecting to " + String(ssid));
   strip.begin();
-  strip.setPixelColor(0, version);
+  strip.setPixelColor(0, VERSION);
   strip.setPixelColor(1, offColor);
   strip.show();
   delay(2000);
-  WiFi.begin(WIFI_STA_SSID, WIFI_STA_PSWD);
+  WiFi.begin(ssid, password);
   WiFi.softAPdisconnect(true);
   
   int i = 0;
